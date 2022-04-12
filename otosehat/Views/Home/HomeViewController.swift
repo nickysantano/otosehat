@@ -56,23 +56,63 @@ extension HomeViewController: UITableViewDelegate{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         tableView.deselectRow(at: indexPath, animated: true)
+        print(indexPath.row)
         
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "DetailReminderViewController") as? DetailReminderViewController{
-            //vc.img = UIImage(named: models[indexPath.row])
-            vc.lbl_name =  models[indexPath.row].title
-            vc.lbl_description =  models[indexPath.row].body
-            let date = models[indexPath.row].date
-            
-            let formatter = DateFormatter()
-            let formatter2 = DateFormatter()
-            formatter.dateFormat = "hh:mm a"
-            formatter2.dateFormat = "EEEE, d MMM YYYY"
-            
-            vc.lbl_time = formatter.string(from: date)
-            vc.lbl_date = formatter2.string(from: date)
-            
-            self.navigationController?.pushViewController(vc, animated: true)
+        guard let vc = storyboard?.instantiateViewController(withIdentifier: "DetailReminderViewController") as? DetailReminderViewController else{
+            return
         }
+        vc.title = "Detail Reminder"
+        vc.navigationItem.largeTitleDisplayMode = .never
+        vc.lbl_name =  models[indexPath.row].title
+        vc.lbl_description =  models[indexPath.row].body
+        vc.indexRow = indexPath
+        let date = models[indexPath.row].date
+        
+        let formatter = DateFormatter()
+        let formatter2 = DateFormatter()
+        formatter.dateFormat = "hh:mm a"
+        formatter2.dateFormat = "EEEE, d MMM YYYY"
+        
+        vc.lbl_time = formatter.string(from: date)
+        vc.lbl_date = formatter2.string(from: date)
+        vc.completionEdit = {
+            title, body, date, index in
+            DispatchQueue.main.async{
+                self.navigationController?.popToRootViewController(animated: true)
+//                vc.dismiss(animated: true)
+                //buat nutup modal after save data
+                let reminderEdited = MyReminder(title: title, body: body, date: date, identifier: "id_\(title)")
+//                self.models.append(reminderEdited)
+                self.models[index.row] = reminderEdited
+                self.table.reloadRows(at: [index], with: .automatic)
+                self.table.reloadData()
+                
+//                let content = UNMutableNotificationContent()
+//                content.title = title
+//                content.sound = .default
+//                content.body = body
+//
+//                let targetDate = date
+//                let trigger = UNCalendarNotificationTrigger(dateMatching: Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: targetDate), repeats: false)
+//
+//                let request = UNNotificationRequest(identifier: "some_long_id", content: content, trigger: trigger)
+//                UNUserNotificationCenter.current().add(request, withCompletionHandler: {error in
+//                    if error != nil{
+//                        print("something went wrong...")
+//                    }
+//                })
+//
+//                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound], completionHandler: {success, error in
+//                    if success{
+//                        //schedule test
+//        //                        self.scheduleTest()
+//                    }else if error != nil{
+//                        print("error occurred")
+//                    }
+//                })
+            }
+        }
+        self.navigationController?.pushViewController(vc, animated: true)
         
     }
     

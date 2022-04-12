@@ -24,55 +24,15 @@ class DetailReminderViewController: UIViewController {
     
     private var models = [MyReminder]()
     
-    @IBAction func didEditBtnTapped(_ sender: Any) {
-        guard let vc = storyboard?.instantiateViewController(withIdentifier: "edit") as? EditReminderViewController else{
-            return
-        }
-//        vc.title = "Edit Reminder"
-//        vc.navigationItem.largeTitleDisplayMode = .never
-//        vc.completion = {
-//            title, body, date in
-//            DispatchQueue.main.async{
-////                self.navigationController?.popToRootViewController(animated: true)
-//                vc.dismiss(animated: true) //buat nutup modal after save data
-//
-//                let new = MyReminder(title: title, body: body, date: date, identifier: "id_\(title)")
-////                self.models.(new)
-//
-////                self.createItem(title: title, body: body, date: date)
-//
-//                let content = UNMutableNotificationContent()
-//                content.title = title
-//                content.sound = .default
-//                content.body = body
-//
-//                let targetDate = date
-//                let trigger = UNCalendarNotificationTrigger(dateMatching: Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: targetDate), repeats: false)
-//
-//                let request = UNNotificationRequest(identifier: "some_long_id", content: content, trigger: trigger)
-//                UNUserNotificationCenter.current().add(request, withCompletionHandler: {error in
-//                    if error != nil{
-//                        print("something went wrong...")
-//                    }
-//                })
-//
-//                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound], completionHandler: {success, error in
-//                    if success{
-//                        //schedule test
-////                        self.scheduleTest()
-//                    }else if error != nil{
-//                        print("error occurred")
-//                    }
-//                })
-//            }
-        
-    }
-    
     var img = UIImage()
     var lbl_time = ""
     var lbl_date = ""
     var lbl_name = ""
     var lbl_description = ""
+    var indexTemp: IndexPath = [0, 0]
+    var indexRow: IndexPath = [0, 0]
+    
+    public var completionEdit: ((String, String, Date, IndexPath) -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,7 +42,41 @@ class DetailReminderViewController: UIViewController {
         lblDate.text = lbl_date
         lblName.text = lbl_name
         lblDescription.text = lbl_description
+        indexTemp = indexRow
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .done, target: self, action: #selector(didEditBtnTapped))
         
     }
+    
+//    @IBAction func editBtn(_ sender: Any) {
+//
+//    }
+    
+    @objc func didEditBtnTapped() {
+        guard let vc = storyboard?.instantiateViewController(withIdentifier: "edit") as? EditReminderViewController else{
+            return
+        }
+        vc.title = "Edit Reminder"
+        vc.navigationItem.largeTitleDisplayMode = .never
+        vc.textTitle = lblName.text ?? "Nil"
+        vc.textDesc = lblDescription.text ?? "Nil"
+        vc.indexRowEdit = indexTemp
+//        var titleGet = ""
+//        var bodyGet = ""
+//        var dateGet: Date
+        vc.completion = {
+            title, body, date, index in
+            DispatchQueue.main.async{
+//                self.navigationController?.popToRootViewController(animated: true)
+                vc.dismiss(animated: true) //buat nutup modal after save data
+                self.completionEdit?(title, body, date, index)
+            }
+        }
+        self.present(vc, animated: true)
+    }
+    
+//    @IBAction func cancelBtn(_ sender: Any) {
+//        self.dismiss(animated: true, completion: nil)
+//    }
+    
 
 }

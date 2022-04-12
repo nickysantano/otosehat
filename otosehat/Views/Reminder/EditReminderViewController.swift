@@ -17,10 +17,16 @@ class EditReminderViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var datePicker: UIDatePicker!
     
-    public var completion: ((String, String, Date) -> Void)?
+    var textTitle: String = ""
+    var textDesc: String = ""
+    var indexRowEdit: IndexPath = []
+    
+    public var completion: ((String, String, Date, IndexPath) -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        titleField.text = textTitle
+        descField.text = textDesc
         titleField.delegate = self
         descField.delegate = self
         
@@ -39,7 +45,7 @@ class EditReminderViewController: UIViewController, UITextFieldDelegate {
            let bodyText = descField.text, !bodyText.isEmpty{
             
             let targetDate = datePicker.date
-            completion?(titleText, bodyText, targetDate)
+            completion?(titleText, bodyText, targetDate, indexRowEdit)
             
         }
     }
@@ -50,7 +56,7 @@ class EditReminderViewController: UIViewController, UITextFieldDelegate {
             
             let targetDate = datePicker.date
             
-            completion?(titleText, bodyText, targetDate)
+            completion?(titleText, bodyText, targetDate, indexRowEdit)
             
         }
     }
